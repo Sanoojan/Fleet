@@ -1,10 +1,10 @@
 # Fleet: Few Shots Lead Effective AI-generated Image Detection
 ## Accepted by ICML 26!
-# Paper on Arxiv
+## Paper on Arxiv
 https://arxiv.org/abs/2606.31082
-# Treasure dataset
+## Treasure dataset
 Apply for access on huggingface: https://huggingface.co/datasets/ThreeLiu/Treasure
-# Fleet code
+## Fleet code
 ## Run
 
 1. Open `Run.sh` and fill in the paths under the "Required path configuration" section at the top of the file (DINOv3 weights, AIGIBench train/val sets, few-shot fake/real data directories, etc.).
