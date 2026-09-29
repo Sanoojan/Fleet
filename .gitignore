@@ -10,3 +10,9 @@ build/
 outputs/
 *.pth
 .ipynb_checkpoints/
+weights/*
+data/*
+outputs_table1/
+outputs_routing_tsne/
+All_outputs/*
+Plots/*

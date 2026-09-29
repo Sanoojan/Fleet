@@ -272,6 +272,31 @@ def validate_with_prototypes(model, validation_sets, fake_prototype, real_protot
     return results
 
 
+def extract_routing_weights(model, image_paths, processor, device,
+                            xception_crop_size=128, batch_size=128,
+                            num_workers=4, max_samples=50):
+    """Extract compact routing distributions for deterministic visualization."""
+    selected_paths = list(image_paths[:max_samples])
+    dataset = DualBranchImageDataset(
+        selected_paths, [0] * len(selected_paths), processor,
+        xception_crop_size, is_training=False
+    )
+    loader = DataLoader(
+        dataset, batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=True
+    )
+    chunks = []
+    model.eval()
+    with torch.no_grad():
+        for img_dinov3, img_xception, _ in loader:
+            img_dinov3 = img_dinov3.to(device, non_blocking=True)
+            img_xception = img_xception.to(device, non_blocking=True)
+            _, routing_weights = model(img_dinov3, img_xception)
+            chunks.append(routing_weights.detach().cpu().numpy())
+    weights = np.concatenate(chunks, axis=0) if chunks else np.empty((0, 0), dtype=np.float32)
+    return weights, selected_paths
+
+
 def print_validation_summary(title, results):
     print(title)
     for dataset_name, result in results.items():
@@ -408,13 +433,16 @@ def run_experiment(args):
     random.seed(42)
     support_fake_paths = random.sample(query_fake_paths, args.n_fake_support)
 
-    # real support directory: reuse real_val_dir and filter images whose filename contains cc12m
-    real_support_dir = args.real_val_dir
+    # Table 1 uses cc12m support but category-specific Non-AI query sets.
+    # Keep the two sources independently configurable.
+    real_support_dir = args.real_support_dir or args.real_val_dir
     real_support_paths_all = []
     for ext in ['*.jpg', '*.jpeg', '*.png', '*.bmp']:
         real_support_paths_all.extend(glob.glob(os.path.join(real_support_dir, '**', ext), recursive=True))
         real_support_paths_all.extend(glob.glob(os.path.join(real_support_dir, '**', ext.upper()), recursive=True))
-    real_support_paths_all = [p for p in real_support_paths_all if 'cc12m' in os.path.basename(p).lower()]
+    cc12m_paths = [p for p in real_support_paths_all if 'cc12m' in os.path.basename(p).lower()]
+    if cc12m_paths:
+        real_support_paths_all = cc12m_paths
 
     if len(real_support_paths_all) < args.n_real_support:
         print(f"Error: real_support has fewer than {args.n_real_support} images ({len(real_support_paths_all)}) - {real_support_dir} (filename contains cc12m)")
@@ -494,14 +522,14 @@ def run_experiment(args):
     val_fake_paths = [p for p, y in zip(val_paths, val_labels) if y == 0]
     val_real_paths = [p for p, y in zip(val_paths, val_labels) if y == 1]
 
-    # final/real is used for testing (derived from real_val_dir or real_support_dir, excluding support images)
-    if args.real_val_dir is not None:
-        # Use the standalone real_val_dir
+    # final/real is the Non-AI query set and may differ from cc12m support.
+    real_query_dir = args.real_query_dir or args.real_val_dir or real_support_dir
+    if real_query_dir is not None:
         real_val_paths_all = []
         for ext in ['*.jpg', '*.jpeg', '*.png', '*.bmp']:
-            real_val_paths_all.extend(glob.glob(os.path.join(args.real_val_dir, '**', ext), recursive=True))
-            real_val_paths_all.extend(glob.glob(os.path.join(args.real_val_dir, '**', ext.upper()), recursive=True))
-        real_val_paths = real_val_paths_all
+            real_val_paths_all.extend(glob.glob(os.path.join(real_query_dir, '**', ext), recursive=True))
+            real_val_paths_all.extend(glob.glob(os.path.join(real_query_dir, '**', ext.upper()), recursive=True))
+        real_val_paths = [p for p in real_val_paths_all if p not in support_real_paths]
     else:
         # Default: exclude the real images used in the support set from real_support_dir
         real_val_paths = [p for p in real_support_paths_all if p not in support_real_paths]
@@ -589,6 +617,16 @@ def run_experiment(args):
     query_key = f'Query集({args.dataset_name})'
     final_real_key = 'final/real'
     print_validation_summary("Validation before training:", initial_results)
+
+    initial_routing_weights = None
+    routing_paths = None
+    if args.routing_export_path:
+        print(f"Extracting pre-adaptation routing weights ({args.routing_export_max_samples} samples)...")
+        initial_routing_weights, routing_paths = extract_routing_weights(
+            model, query_paths, processor, device, args.xception_crop_size,
+            batch_size=args.val_batch_size, num_workers=args.num_workers,
+            max_samples=args.routing_export_max_samples,
+        )
 
     # Check the Query-set accuracy
     query_key = f'Query集({args.dataset_name})'
@@ -678,6 +716,24 @@ def run_experiment(args):
         final_query_acc = final_results.get(query_key, {}).get('total_acc', 0.0)
         final_real_acc = final_results.get(final_real_key, {}).get('total_acc', 0.0)
         best_avg_acc = (final_query_acc + final_real_acc) / 2.0
+
+    if args.routing_export_path:
+        print(f"Extracting post-adaptation routing weights ({args.routing_export_max_samples} samples)...")
+        final_routing_weights, final_routing_paths = extract_routing_weights(
+            model, routing_paths, processor, device, args.xception_crop_size,
+            batch_size=args.val_batch_size, num_workers=args.num_workers,
+            max_samples=args.routing_export_max_samples,
+        )
+        routing_export_path = Path(args.routing_export_path)
+        routing_export_path.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(
+            routing_export_path,
+            dataset_name=np.asarray(args.dataset_name),
+            paths=np.asarray(final_routing_paths),
+            pretrain=initial_routing_weights,
+            fewshot=final_routing_weights,
+        )
+        print(f"Routing weights saved: {routing_export_path}")
 
     # Save the few-shot model weights on demand (including the case where training is skipped)
     if args.save_fewshot_model:
@@ -793,10 +849,18 @@ def main():
     parser.add_argument('--distill_weight', type=float, default=10.0)
     parser.add_argument('--force_train', action='store_true', help='Force training even if the pre-training Query-set accuracy is > 90')
     parser.add_argument('--save_fewshot_model', action='store_true', help='Save the few-shot fine-tuned model weights (off by default)')
+    parser.add_argument('--routing_export_path', type=str, default=None,
+                        help='Optional .npz path for matched pre/post routing weights')
+    parser.add_argument('--routing_export_max_samples', type=int, default=50,
+                        help='Maximum fake query images to export for routing visualization')
 
     # Data-path arguments (for final/fake and final/real)
     parser.add_argument('--real_val_dir', type=str, default=None,
-                        help='Real validation directory; env var FLEET_REAL_VAL_DIR')
+                        help='Legacy shared real support/query directory; env var FLEET_REAL_VAL_DIR')
+    parser.add_argument('--real_support_dir', type=str, default=None,
+                        help='Non-AI support source (cc12m); env var FLEET_REAL_SUPPORT_DIR')
+    parser.add_argument('--real_query_dir', type=str, default=None,
+                        help='Non-AI query/test directory; env var FLEET_REAL_QUERY_DIR')
     parser.add_argument('--aigibench_train_dir', type=str, default=None,
                         help='AIGIBench training set (Memory set); env var FLEET_AIGIBENCH_TRAIN')
     parser.add_argument('--aigibench_val_dir', type=str, default=None,
@@ -822,6 +886,10 @@ def main():
     raw_dino = coalesce_cli_env(args.dinov3_model_path, "FLEET_DINOV3_MODEL_PATH")
     args.dinov3_model_path = resolve_dinov3_model_path(raw_dino if raw_dino else None)
     args.real_val_dir = coalesce_cli_env(args.real_val_dir, "FLEET_REAL_VAL_DIR")
+    args.real_support_dir = coalesce_cli_env(args.real_support_dir, "FLEET_REAL_SUPPORT_DIR")
+    args.real_query_dir = coalesce_cli_env(args.real_query_dir, "FLEET_REAL_QUERY_DIR")
+    args.real_support_dir = args.real_support_dir or args.real_val_dir
+    args.real_query_dir = args.real_query_dir or args.real_val_dir or args.real_support_dir
     args.aigibench_train_dir = coalesce_cli_env(args.aigibench_train_dir, "FLEET_AIGIBENCH_TRAIN")
     args.aigibench_val_dir = coalesce_cli_env(args.aigibench_val_dir, "FLEET_AIGIBENCH_VAL")
 
@@ -830,8 +898,10 @@ def main():
         missing.append("(--pretrain_checkpoint or FLEET_PRETRAIN_CHECKPOINT)")
     if not args.prototype_dir:
         missing.append("(--prototype_dir or FLEET_PROTOTYPE_DIR)")
-    if not args.real_val_dir:
-        missing.append("(--real_val_dir or FLEET_REAL_VAL_DIR)")
+    if not args.real_support_dir:
+        missing.append("(--real_support_dir or --real_val_dir)")
+    if not args.real_query_dir:
+        missing.append("(--real_query_dir or --real_val_dir)")
     if not args.aigibench_train_dir:
         missing.append("(--aigibench_train_dir or FLEET_AIGIBENCH_TRAIN)")
     if not args.aigibench_val_dir:

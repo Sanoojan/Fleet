@@ -1,0 +1,65 @@
+step,directory,display_name,release_date,family,source,uncertainty
+1,ProGAN,ProGAN,2017-10-27,GAN,https://arxiv.org/abs/1710.10196,First public paper date used as chronology proxy; exact checkpoint release date not established.
+2,StarGAN,StarGAN,2017-11-24,GAN,https://arxiv.org/abs/1711.09020,First public paper date used as chronology proxy; exact checkpoint release date not established.
+3,BigGAN,BigGAN,2018-09-28,GAN,https://arxiv.org/abs/1809.11096,First public paper date used as chronology proxy; exact checkpoint release date not established.
+4,DF-GAN,DF-GAN,2020-08-13,GAN,https://arxiv.org/abs/2008.05865,First public paper date used as chronology proxy; exact checkpoint release date not established.
+5,ADM,ADM,2021-05-11,Diffusion,https://arxiv.org/abs/2105.05233,First public paper date used as chronology proxy; exact checkpoint release date not established.
+6,StyleGAN3,StyleGAN3,2021-06-23,GAN,https://arxiv.org/abs/2106.12423,First public paper date used as chronology proxy; exact checkpoint release date not established.
+7,VQDM,VQDM,2021-11-29,Diffusion,https://arxiv.org/abs/2111.14822,First public paper date used as chronology proxy; exact checkpoint release date not established.
+8,GLIDE,GLIDE,2021-12-20,Diffusion,https://arxiv.org/abs/2112.10741,First public paper date used as chronology proxy; exact checkpoint release date not established.
+9,DALLE-2,DALL-E 2,2022-04-13,,https://openai.com/index/hierarchical-text-conditional-image-generation-with-clip-latents/,Public research publication date; staged access preceded general availability.
+10,CogView2,CogView2,2022-04-28,,https://arxiv.org/abs/2204.14217,First public paper date used as chronology proxy; exact checkpoint release date not established.
+11,Imagen,Imagen,2022-05-23,Diffusion,https://arxiv.org/abs/2205.11487,First public paper date used as chronology proxy; exact checkpoint release date not established.
+12,SDv1.4,SD v1.4,2022-08-22,Diffusion,https://stability.ai/news-updates/celebrating-one-year-of-stable-diffusion,
+13,SDv1.5,SD v1.5,2022-10-20,,https://huggingface.co/acheong08/SD-V1-5-cloned/commit/62e72774333627e09002e1ae551dc6c5c8d29e91,Archived original HF-staff model-card commit linking Runway weights; original Runway repository removed.
+14,Midjourney_V4,Midjourney V4,2022-11,,https://docs.midjourney.com/hc/en-us/articles/33329788681101-Legacy-Features,Official release month only; within-month order unresolved.
+15,SDv2.1,SD v2.1,2022-12-07,Diffusion,https://stability.ai/blog/stablediffusion2-1-release7-dec-2022,
+16,Midjourney_V5,Midjourney V5,2023-03,,https://docs.midjourney.com/hc/en-us/articles/33329788681101-Legacy-Features,Official release month only; within-month order unresolved.
+17,GigaGAN,GigaGAN,2023-03-09,GAN,https://arxiv.org/abs/2303.05511,First public paper date used as chronology proxy; exact checkpoint release date not established.
+18,DeepFloyd_IF,DeepFloyd IF,2023-04-28,,https://stability.ai/news-updates/deepfloyd-if-text-to-image-model,
+19,SDXL,SDXL,2023-07-26,Diffusion,https://stability.ai/news-updates/stable-diffusion-sdxl-1-announcement,
+20,DALLE-3,DALL-E 3,2023-09,,https://openai.com/index/dall-e-3/,Announcement month; staged rollout in October 2023. Within-month order unresolved.
+21,pixart-α,PixArt-alpha,2023-09-30,Diffusion,https://arxiv.org/abs/2310.00426,First public paper date used as chronology proxy; exact checkpoint release date not established.
+22,Playground_v2,Playground V2,2023-12-05,,https://huggingface.co/playgroundai/playground-v2-1024px-aesthetic/blob/0379851f83661b6e5708073c8d502901bbb6e7a4/LICENSE.md,Release date explicitly stated in publisher license.
+23,Midjourney_V6,Midjourney V6,2023-12-20,,https://docs.midjourney.com/hc/en-us/articles/32199405667853-Version,
+24,Playground_v2.5,Playground V2.5,2024-02-27,Diffusion,https://arxiv.org/abs/2402.17245,Public paper date; model release reported concurrently.
+25,SD3-Medium,SD3-medium,2024-06-12,Diffusion,https://stability.ai/news/stable-diffusion-3-medium,
+26,LlamaGen,LlamaGen,2024-06-28,Autoregressive,https://raw.githubusercontent.com/FoundationVision/LlamaGen/main/README.md,
+27,Kolors,Kolors,2024-07-06,Diffusion,https://raw.githubusercontent.com/Kwai-Kolors/Kolors/master/README.md,
+28,HunyuanDiT,Hunyuan-DiT,2024-07-08,Diffusion,https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanDiT/main/README.md,Treasure index points to v1.2; use v1.2 release rather than original family announcement.
+29,Midjourney V6.1,Midjourney v6.1,2024-07-30,,https://updates.midjourney.com/version-6-1/,
+30,FLUX.1-dev,FLUX.1-dev,2024-08-01,,https://blackforestlabs.ai/announcing-black-forest-labs/,
+31,Show_o,Show-o,2024-08-23,,https://raw.githubusercontent.com/showlab/Show-o/main/README.md,
+32,Cogview3-plus,CogView3plus,2024-09-29,Diffusion,https://raw.githubusercontent.com/THUDM/CogView3/main/README.md,
+33,OmniGen_v1,OmniGen,2024-10-22,,https://huggingface.co/Shitao/OmniGen-v1/raw/main/README.md,
+34,Infinity,Infinity-2B,2024-12-24,Autoregressive,https://raw.githubusercontent.com/FoundationVision/Infinity/main/README.md,
+35,Lumina,LUMINA-Image 2.0,2025-01-25,Diffusion,https://raw.githubusercontent.com/Alpha-VLLM/Lumina-Image-2.0/main/README.md,
+36,Janus-Pro-7B,Janus-Pro-7B,2025-01-27,Autoregressive,https://raw.githubusercontent.com/deepseek-ai/Janus/main/README.md,
+37,CogView4,CogView4,2025-03-04,Diffusion,https://raw.githubusercontent.com/THUDM/CogView4/main/README.md,Official diffusers release; API version used by Treasure is unspecified.
+38,Sana_v1.5,SANA v1.5,2025-03-16,Diffusion,https://raw.githubusercontent.com/NVlabs/Sana/main/README.md,
+39,GPT4O_Image_T2I,GPT-4o,2025-03-25,,https://openai.com/index/introducing-4o-image-generation/,"Image generation launch, not GPT-4o language-model release."
+40,sora-image,Sora-image,2025-03-25,,https://openai.com/index/introducing-4o-image-generation/,Announcement includes 4o image generation in Sora; exact backend/version of Treasure API samples unspecified.
+41,Midjourney V7,Midjourney v7,2025-04-04,,https://updates.midjourney.com/v7-alpha/,Official alpha announcement date; release-history documentation may use April 3 due to timezone.
+42,HiDream-I1-Dev,HiDream-I1-Dev,2025-04-07,Diffusion,https://raw.githubusercontent.com/HiDream-ai/HiDream-I1/main/README.md,
+43,doubao-seedream-3.0-t2i,Doubao Seedream 3.0,2025-04-15,,https://arxiv.org/abs/2504.11346,First public paper date; exact API launch day not established.
+44,BAGEL-7B,BAGEL,2025-05-20,,https://raw.githubusercontent.com/ByteDance-Seed/Bagel/main/README.md,
+45,Imagen4,Imagen 4,2025-05-20,Diffusion,https://blog.google/technology/ai/generative-media-models-io-2025/,
+46,BRIA_v3_2,BRIA 3.2,2025-06-10,,https://bria.ai/eu-policy,Provider explicitly records EU market placement date.
+47,OmniGen_v2,OmniGen2,2025-06-16,,https://raw.githubusercontent.com/VectorSpaceLab/OmniGen2/main/README.md,
+48,Show_o2,Show-o2,2025-06-19,,https://raw.githubusercontent.com/showlab/Show-o/main/README.md,
+49,ovis-U1,Ovis-U1,2025-06-29,,https://arxiv.org/abs/2506.23044,First public paper date; exact weights publication day not established.
+50,wan2.2-t2i-flash,wan2.2-t2i-flash,2025-07-28,,https://help.aliyun.com/en/model-studio/newly-released-models,
+51,Qwen-Image,Qwen-Image,2025-08-04,,https://raw.githubusercontent.com/QwenLM/Qwen-Image/main/README.md,
+52,NextStep,NextStep-1,2025-08-14,Autoregressive,https://raw.githubusercontent.com/stepfun-ai/NextStep-1/main/README.md,
+53,Nano Banana,Nano Banana,2025-08-26,,https://developers.googleblog.com/en/introducing-gemini-2-5-flash-image/,
+54,doubao-seedream-4.0,Doubao Seedream 4.0,2025-09-09,,https://seed.bytedance.com/en/blog/seedream-4-0-officially-released-beyond-drawing-into-imagination,
+55,wan2.5-t2i-preview,wan2.5-t2i-preview,2025-09-19,,https://help.aliyun.com/en/model-studio/newly-released-models,Earliest listed regional launch; international launch 2025-09-24.
+56,HunyuanImage-3.0,HunyuanImage 3.0,2025-09-28,,https://raw.githubusercontent.com/Tencent-Hunyuan/HunyuanImage-3.0/main/README.md,
+57,Nano-Banana-Pro,Nano Banana Pro,2025-11-20,,https://blog.google/innovation-and-ai/products/nano-banana-pro/,
+58,FLUX.2,FLUX.2,2025-11-25,,https://bfl.ai/blog/flux-2,
+59,Z-Image-Turbo,Z-Image-Turbo,2025-11-26,,https://raw.githubusercontent.com/Tongyi-MAI/Z-Image/main/README.md,
+60,LongCat-Image,LongCat-Image,2025-12-05,,https://raw.githubusercontent.com/meituan-longcat/LongCat-Image/main/README.md,
+61,gpt-image-1.5,GPT-image-1.5,2025-12-16,,https://openai.com/index/new-chatgpt-images-is-here/,
+62,MAE,MaskGit / MAE local folder,,,https://github.com/hy-zpg/AIGC-Image-Detection-Dataset,"Treasure calls this MaskGit / MAE; exact generator identity ambiguous, so no release date asserted. Unknown entries last."
+63,Wukong,Wukong,,,https://github.com/GenImage-Dataset/GenImage,Release date not established from authoritative source; explicitly unresolved and placed after dated entries.
+64,ideogram,Ideogram,,,https://huggingface.co/datasets/terminusresearch/ideogram-75k,Treasure omits version; cannot reliably distinguish Ideogram 0.x/1.x/2.x release. Unknown entries last.

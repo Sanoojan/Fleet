@@ -150,6 +150,7 @@ def main():
     # Training hyperparameters (commonly tuned)
     parser.add_argument('--weight_decay', type=float, default=0.01)
     parser.add_argument('--batch_size', type=int, default=256)
+    parser.add_argument('--learning_rate', type=float, default=1e-4)
     parser.add_argument('--num_epochs', type=int, default=2)
     parser.add_argument('--eval_every_steps', type=int, default=300)
     parser.add_argument('--target_acc', type=float, default=98.0, help='AIGIBench/val early-stop threshold')
@@ -174,7 +175,7 @@ def main():
     lora_dropout = 0.0
     num_heads = 8
     temperature = 0.07
-    learning_rate = 1e-4  # hardcoded
+    learning_rate = args.learning_rate
     weight_decay = args.weight_decay
     batch_size = args.batch_size
     num_epochs = args.num_epochs
@@ -207,6 +208,7 @@ def main():
         print(
             f"[Pretrain] Start: dim={projection_dim}, "
             f"orth={attn_orth_weight}, coverage={attn_cov_weight}, "
+            f"batch={batch_size}, lr={learning_rate:g}, "
             f"eval_interval={eval_every_steps}, max_steps={step_limit_desc}"
         )
     

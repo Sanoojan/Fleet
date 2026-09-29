@@ -1,0 +1,59 @@
+experiment_name: treasure_continual_fleet_5shot_aigibench_replay
+seed: 42
+pretrained_checkpoint: outputs_single_gpu/checkpoints_q128/pretrain_dual_branch_with_attn_loss_and_coverage_no_residual_q128.pth
+prototype_path: outputs_single_gpu/checkpoints_q128/prototypes_dual_branch_with_attn_loss_and_coverage_no_residual_q128_freq
+model_path: weights/dinov3-vitl16-pretrain-lvd1689m
+aigibench_train_path: data/AIGIBench/train
+aigibench_validation_path: data/AIGIBench/val
+treasure_fake_root: data/Treasure/fake
+treasure_real_root: data/Treasure/real
+real_support_root: data/Treasure/real/cc12m-2mp-realistic
+generator_order_file: Configs/treasure_generator_order.csv
+output_root: All_outputs
+shot_count: 5
+support_composition: {fake: 5, real: 5}
+decision_threshold: 0.5
+replay_enabled: true
+replay_size: 1000
+replay_batch_size: 32
+# Replay examples / all 10 support images in each update; final batch may be smaller.
+replay_batch_ratio: 3.2
+replay_fake_fraction: 0.5
+replay_sampling_strategy: fixed
+# Reserved ablation: enabling this currently fails explicitly.
+treasure_replay_enabled: false
+adaptation_epochs: 20
+learning_rate: 0.00003
+weight_decay: 0.01
+support_batch_size: 10
+trainable_components: [lora, xception, xception_fc, routing, projection]
+distillation_weight: 10.0
+avoidance_weight: 20.0
+contrastive_weight: 5.0
+contrastive_warmup_epochs: 5
+temperature: 0.07
+num_workers: 4
+evaluation_batch_size: 128
+retention_samples_per_class: 1000
+xception_crop_size: 128
+checkpoint_frequency: 0
+best_metric: auroc
+resume: true
+max_generators: null
+max_evaluation_samples_per_generator: null
+model:
+  xception_feature_dim: 1024
+  projection_dim: 256
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.0
+  feature_layer: -1
+  use_last_hidden_state: false
+  normalize_feature: false
+wandb:
+  project: fleet-treasure-continual
+  entity: null
+  group: treasure-5shot-aigibench-replay
+  tags: [fleet, continual, treasure, 5shot, aigibench-replay]
+  mode: disabled
+  run_name: null

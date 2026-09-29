@@ -4,26 +4,30 @@
 set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$REPO_ROOT"
-PYTHON="${PYTHON:-python}"
+PYTHON="${PYTHON:-/egr/research-sprintai/baliahsa/miniconda3/envs/AIGB/bin/python}"
 export PYTHONPATH="${REPO_ROOT}/src:${PYTHONPATH:-}"
-ALL_GPUS="${ALL_GPUS:-0,1,2,3,4,5,6,7}"
+ALL_GPUS="${ALL_GPUS:-0}"
+PRETRAIN_BATCH_SIZE="${PRETRAIN_BATCH_SIZE:-64}"
+PRETRAIN_LR="${PRETRAIN_LR:-2.5e-5}"
+PRETRAIN_MAX_STEPS="${PRETRAIN_MAX_STEPS:-8000}"
+PRETRAIN_EVAL_STEPS="${PRETRAIN_EVAL_STEPS:-1200}"
 
 SAVE_FEWSHOT_MODEL="${SAVE_FEWSHOT_MODEL:-0}"
 [ "$SAVE_FEWSHOT_MODEL" = "1" ] || SAVE_FEWSHOT_MODEL=""
 
 # ============ Required path configuration (edit for your environment) ============
-DINO=/path/to/dinov3-vitl16-pretrain-lvd1689m
-TRAIN=/path/to/AIGIBench/train
-VAL=/path/to/AIGIBench/train/val
-FAKE_BASE=/path/to/Treasure/fake
-REAL_VAL=/path/to/Treasure/real
+DINO="${DINO:-${REPO_ROOT}/weights/dinov3-vitl16-pretrain-lvd1689m}"
+TRAIN="${TRAIN:-${REPO_ROOT}/data/AIGIBench/train}"
+VAL="${VAL:-${REPO_ROOT}/data/AIGIBench/val}"
+FAKE_BASE="${FAKE_BASE:-${REPO_ROOT}/data/Treasure/fake}"
+REAL_VAL="${REAL_VAL:-${REPO_ROOT}/data/Treasure/real}"
 
 
 # ============ Output directory (keep the Fleet dir clean; outputs go elsewhere) ============
-OUTPUT_ROOT="${OUTPUT_ROOT:-/path/to/outputs}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-${REPO_ROOT}/outputs}"
 CKPT_DIR="${OUTPUT_ROOT}/checkpoints_q128"
-CKPT="${CKPT_DIR}/pretrain_model.pth"
-PROTO="${CKPT_DIR}/prototypes"
+CKPT="${CKPT_DIR}/pretrain_dual_branch_with_attn_loss_and_coverage_no_residual_q128.pth"
+PROTO="${CKPT_DIR}/prototypes_dual_branch_with_attn_loss_and_coverage_no_residual_q128_freq"
 FS_OUT="${OUTPUT_ROOT}/fewshot_experiment"
 LOG_DIR="${OUTPUT_ROOT}/logs"
 mkdir -p "$LOG_DIR" "$CKPT_DIR" "$FS_OUT"
@@ -40,6 +44,8 @@ else
   "$PYTHON" -m fleet.train.dual_branch_q128 \
       --dinov3_model_path "$DINO" \
       --aigibench_train "$TRAIN" --aigibench_val "$VAL" \
+      --batch_size "$PRETRAIN_BATCH_SIZE" --learning_rate "$PRETRAIN_LR" \
+      --max_train_steps "$PRETRAIN_MAX_STEPS" --eval_every_steps "$PRETRAIN_EVAL_STEPS" \
       --output_dir "$CKPT_DIR" --force_train 1 \
       > "${LOG_DIR}/pretrain.log" 2>&1
   test -f "$CKPT" && test -d "$PROTO" || { echo "[ERROR] Pretrained weights were not generated"; exit 1; }
@@ -62,7 +68,7 @@ run_fs () {
   OUTPUT_BASE_DIR="$FS_OUT" SUBSETS_CSV="$dataset" NUM_EPOCHS=20 BATCH_SIZE=32 \
   DISTILL_WEIGHT=10.0 NUM_WORKERS=16 VAL_BATCH_SIZE=256 \
   SAVE_FEWSHOT_MODEL="$SAVE_FEWSHOT_MODEL" \
-  FORCE=1 CONDA_SH= ENV_NAME= \
+  FORCE="${FORCE_FEWSHOT:-0}" SKIP_IF_DONE=1 CONDA_SH= ENV_NAME= \
   bash "${REPO_ROOT}/src/fleet/train/run_fewshot_experiment.sh" > "$log" 2>&1
 }
 i=0; total=${#DATASETS[@]}
